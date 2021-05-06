@@ -1,31 +1,26 @@
-const Discord = require ('discord.js')
-const random = require ('random')
-module.exports.config = {
-    name: "coinflip",
-    aliases: ["cf"],
+const { MessageEmbed } = require('discord.js');
+
+module.exports = {
+    name: 'coinflip',
+    aliases: ['cf'],
     description: 'Flip a coin and get an answer of either heads or tails',
-    category: "fun",
+    category: 'fun',
     dmOnly: false, // Boolean
     guildOnly: false, // Boolean
     args: false, // Boolean
-    usage: '',
+    usage: '{prefix}coinflip',
     cooldown: 3, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["SEND_MESSAGES"],
-}
+    permissions: ['SEND_MESSAGES'],
+    run: ({ message }) => {
+        const coin = ['heads', 'tails'];
 
-module.exports.run = async (client, message, args) => {
+        const embed = new MessageEmbed()
+        .setColor('#36393f')
+        .setTitle('Coin Flip Result')
+        .setDescription(`The coin was flipped and the result is **${coin[Math.floor(Math.random() * coin.length)]}**`) // Setting the embed description as the coinflip result
+        .setFooter(`Invoked by ${message.author.tag}`)
 
-const coin = [`heads`, `tails`,]; // Defining the array of answers for the coinflip
-const index = random.int(0, coin.length - 1)
-    
-let result = (coin[index])
-const Embed = new Discord.MessageEmbed()
-.setColor('#36393f')
-.setTitle(`Coin Flip Result`)
-.setDescription(`The coin was flipped and the result is **${result}**`) // Setting the embed description as the coinflip result
-.setFooter(`Invoked by ${message.author.tag}`)
-                
-message.reply(Embed);
-
+        message.channel.send(message.author, { embed, });
+    }
 }

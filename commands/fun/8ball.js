@@ -1,28 +1,48 @@
-const Discord = require ('discord.js')
-const random = require ('random')
-module.exports.config = {
-    name: "8ball",
+const { MessageEmbed } = require('discord.js');
+
+let answers = [
+    'As i see it, yes.',
+    'Ask again later.',
+    'Better not tell you now.',
+    'Cannot predict now.',
+    'Concentrate and ask again',
+    'Don\'t count on it.',
+    'It is certain.',
+    'It is decidedly so.',
+    'Most Likely',
+    'My reply is no',
+    'My sources say no',
+    'Outlook not so good',
+    'Outlook good',
+    'Reply hazy, try again',
+    'Signs point to yes',
+    'Very doubtful',
+    'Without a doubt',
+    'Yes',
+    'Yes- Definitely',
+    'You may rely on it'
+] // Defining the array for the answers
+
+module.exports = {
+    name: '8ball',
     aliases: [],
     description: 'This command will let the bot give you a response on a question that comes from an 8Ball.',
-    category: "fun",
+    category: 'fun',
     dmOnly: false, // Boolean
     guildOnly: true, // Boolean
     args: true, // Boolean
-    usage: '<Question>',
+    usage: '{prefix}8ball <Question>',
     cooldown: 3, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["SEND_MESSAGES"],
-}
+    permissions: ['SEND_MESSAGES'],
+    run: ({ message }) => {
+        let response = responses[Math.floor(Math.random() * answers.length)];
 
-module.exports.run = async (client, message, args) => {
-
-let answers = ['As i see it, yes.', 'Ask again later.', 'Better not tell you now.', 'Cannot predict now.', 'Concentrate and ask again', 'Don\'t count on it.', 'It is certain.', 'It is decidedly so.', 'Most Likely', 'My reply is no', 'My sources say no', 'Outlook not so good', 'Outlook good', 'Reply hazy, try again', 'Signs point to yes', 'Very doubtful', 'Without a doubt', 'Yes', 'Yes- Definitely', 'You may rely on it'] // Defining the array for the answers
-let response = random.int(0, answers.length - 1) // Generating a random number between 0 and the answers array length
-
-let embed = new Discord.MessageEmbed()
-.setTitle('8Ball Response')
-.setColor('#36393f')
-.setDescription(answers[response]) // Using the answers array aswell with the random number to display the bots response
-
-message.reply(embed)
+        const embed = new MessageEmbed()
+        .setColor('#36393f')
+        .setTitle('8ball response')
+        .setDescription(response)
+        
+        message.channel.send(message.author, { embed, });
+    }
 }

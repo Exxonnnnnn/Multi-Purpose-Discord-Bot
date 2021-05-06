@@ -1,35 +1,35 @@
-const Discord = require ('discord.js')
-const axios = require ('axios')
-module.exports.config = {
-    name: "chucknorris",
+const { MessageEmbed } = require('discord.js');
+
+module.exports = {
+    name: 'chucknorris',
     aliases: [],
     description: 'This will use the api to fetch a random chuck norris joke and send it in an embed',
-    category: "fun",
+    category: 'fun',
     dmOnly: false, // Boolean
     guildOnly: false, // Boolean
     args: false, // Boolean
-    usage: '',
+    usage: '{prefix}chucknorris',
     cooldown: 5, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["SEND_MESSAGES"],
-}
+    permissions: ['SEND_MESSAGES'],
+    run: async ({ message }) => {
+        const res = await axios({
+            method: 'get', // Using a GET method for the api request
+            url: 'https://api.thecatapi.com/v1/images/search' // Setting the URL to use for the api request
+        })
+        .catch(() =>
+            message.reply('An error has occured whilst fetching that data!')
+        );
 
-module.exports.run = async (client, message, args) => {
+        if (!res || !res.data)
+            return message.channel.send('An error has occured, please try again!');
 
-axios({
-    method: "get", // Using a GET method for the api request
-    url: "https://api.chucknorris.io/jokes/random" // Setting the URL to use for the api request
-}).then(async res => {
+        const embed = new MessageEmbed()
+        .setColor('#36393f')
+        .setTitle(res.data.value)
+        .setFooter(`Invoked by ${message.author.tag}`)
+        .setTimestamp()
 
-const embed = new Discord.MessageEmbed()
-.setColor('#36393f')
-.setTimestamp()
-.setFooter(`Invoked by ${message.author.tag}`)
-
-.setTitle(res.data.value) // Setting the embed title as the joke from the api
-
-message.reply(embed)
-
-}).catch(err => message.channel.send('An error has occured whilst fetching that data!'))
-
+        message.channel.send(message.author, { embed, });
+    }
 }

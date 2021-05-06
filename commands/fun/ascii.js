@@ -1,32 +1,26 @@
-const Discord = require ('discord.js')
-const figlet = require ("figlet")
-module.exports.config = {
-    name: "ascii",
+const figlet = require('figlet');
+
+module.exports = {
+    name: 'ascii',
     aliases: [],
     description: 'Turns your specfied text into ascii text in an embed',
-    category: "fun",
+    category: 'fun',
     dmOnly: false, // Boolean
     guildOnly: false, // Boolean
     args: true, // Boolean
-    usage: '<text>',
+    usage: '{prefix}ascii <text>',
     cooldown: 5, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["SEND_MESSAGES"],
+    permissions: ['SEND_MESSAGES'],
+    run: ({ message, args }) => {
+        figlet.text(args.join(' '), async function (err, data) {
+            if (err)
+                return message.channel.send('An error occured, please try again!');
+            
+            if (data.length > 2000)
+                return message.channel.send('Please provide text shorter than 2000 characters');
+
+            return message.channel.send(`\`\`\`${data}\`\`\``);
+        }) 
+    }
 }
-
-module.exports.run = async (client, message, args) => {
-
-figlet.text(args.join(" "), (err, text) => { // Translating the text into ascii text
-
-if (err) {
-    return message.channel.send(err) // If an error happened it returns with the error
-}
-
-const embed = new Discord.MessageEmbed()
-.setTitle(`Your Text Asciified`)
-.setColor('#36393f')
-.setDescription(`\`\`\`${text.trimRight()}\`\`\``) // Adding the asciified text to the embed
-
-message.channel.send(embed)
-
-})}

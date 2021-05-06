@@ -1,36 +1,36 @@
-const Discord = require ('discord.js')
-const axios = require ('axios')
-module.exports.config = {
-    name: "joke",
+const { MessageEmbed } = require('discord.js');
+
+module.exports = {
+    name: 'joke',
     aliases: [],
     description: 'This will use the api to get a random joke and send it in an embed',
-    category: "fun",
+    category: 'fun',
     dmOnly: false, // Boolean
     guildOnly: false, // Boolean
     args: false, // Boolean
-    usage: '<> <>',
+    usage: '{prefix}joke',
     cooldown: 5, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["SEND_MESSAGES"],
-}
+    permissions: ['SEND_MESSAGES'],
+    run: async ({ message }) => {
+        const res = await axios({
+            method: 'get', // Using a GET method for the api request
+            url: 'https://icanhazdadjoke.com/', // Setting the URL to use for the api request
+            headers: { 'Accept': 'text/plain' } // Setting the header for the api request
+        })
+        .catch(() =>
+            message.reply('An error has occured whilst fetching that data!')
+        );
 
-module.exports.run = async (client, message, args) => {
+        if (!res || !res.data)
+            return message.channel.send('An error has occured, please try again!');
+        
+        const embed = new MessageEmbed()
+        .setColor('#36393f')
+        .setTitle(res.data)
+        .setFooter(`Invoked by ${message.author.tag}`)
+        .setTimestamp()
 
-axios({
-    method: 'get', // Using a GET method for the api request
-    url: 'https://icanhazdadjoke.com/', // Setting the URL to use for the apu request
-    headers: {'Accept': 'text/plain'} // Setting the header for the api request
-}).then(async res => {
-    
-    const embed = new Discord.MessageEmbed()
-    .setColor('#36393f')
-    .setTimestamp()
-    .setFooter(`Invoked by ${message.author.tag}`)
-
-    .setTitle(res.data) // Setting the embed title as the joke fetched from the api
-
-    message.reply(embed)
-
-}).catch(err => message.channel.send('An error has occured whilst fetching that data!'))
-
+        message.channel.send(message.author, { embed, });
+    }
 }
