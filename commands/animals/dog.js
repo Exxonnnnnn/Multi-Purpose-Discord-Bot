@@ -1,34 +1,35 @@
-const Discord = require ('discord.js')
-const axios = require ('axios') // Defining the module for the api request
-module.exports.config = {
-    name: "dog",
+const axios = require('axios'); // Defining the module for the api request
+const { MessageEmbed } = require('discord.js');
+const ApiKey = require('../../configs/Api-Keys.json'); // Make sure you have your api key pasted in this folder else it will error
+
+module.exports = {
+    name: 'dog',
     aliases: [],
     description: 'This command will display a picture of a dog that has been pulled from an api request.',
-    category: "animals",
+    category: 'animals',
     dmOnly: false, // Boolean
     guildOnly: false, // Boolean
     args: false, // Boolean
-    usage: '',
+    usage: '{prefix}false',
     cooldown: 5, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["SEND_MESSAGES"],
-}
+    permissions: ['SEND_MESSAGES'],
+    run: async ({ message }) => {
+        const res = await axios({
+            method: 'get', // Using a GET method for the api request
+            url: 'https://dog.ceo/api/breeds/image/random', // Defining the URL to pull the request from, this will get the photo from that URL
+            headers: { 'api-key': `${ApiKey.CatKey}` } // Defining the header for the api key that you put into the api key file
+        })
+        .catch(() =>
+            message.reply('An error has occured whilst fetching that data!')
+        );
 
-module.exports.run = async (client, message, args) => {
+        const embed = new MessageEmbed()
+        .setColor('#36393f')
+        .setImage(res.data[0].url)
+        .setFooter(`Invoked by ${message.author.tag}`)
+        .setTimestamp()
 
-axios({
-    method: 'get', // Using a GET request for the api request
-    url: "https://dog.ceo/api/breeds/image/random" // Defining the URL to use for the api request
-}).then(async res => {
-
-const embed = new Discord.MessageEmbed()
-.setImage(res.data.message) // Setting the embed message as the fetched image from the api
-.setColor('#36393f')
-.setTimestamp()
-.setFooter(`Invoked by ${message.author.tag}`)
-
-message.reply(embed)
-
-}).catch(err => message.channel.send('An error has occured whilst fetching that data!')) // If there was an error getting the api request then it will return with this message
-
+        message.channel.send(message.author, { embed, });
+    }
 }
