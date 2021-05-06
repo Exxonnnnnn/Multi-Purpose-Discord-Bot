@@ -135,7 +135,7 @@ client.on("message", async message => {
 
 
     if (message.author.bot || !message.content.startsWith(prefix)) return;
-    const args = message.content.slice(config.prefix.length).split(/ +/g);
+    const args = message.content.slice(prefix.length).split(/ +/g);
     if (!args.length) return message.channel.send(`You didn't pass any command to reload, ${message.author}!`);
     const commandName = args.shift().toLowerCase();
 
@@ -173,7 +173,7 @@ client.on("message", async message => {
 
             //+ usage: '<> <>',
             if (cmd.config.usage) {
-                reply += `\nThe proper usage would be: \`${config.prefix}${cmd.config.name} ${cmd.config.usage}\``;
+                reply += `\nThe proper usage would be: \`${prefix}${cmd.config.name} ${cmd.config.usage}\``;
             }
             
             return message.channel.send(reply);
