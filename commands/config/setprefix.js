@@ -1,32 +1,38 @@
-const Discord = require ('discord.js')
-module.exports.config = {
-    name: "setprefix",
+const schema = require('../../mongoose/prefix'); // Defining the schema
+
+module.exports = {
+    name: 'setprefix',
     aliases: [],
-    description: 'This will allow you to set the prefix for the message guild, this will update the prefix so all commands work with that prefix instead of \`>\`.',
-    category: "config",
+    description:
+        'This will allow you to set the prefix for the message guild, this will update the prefix so all commands work with that prefix instead of \`>\`.',
+    category: 'config',
     dmOnly: false, // Boolean
     guildOnly: true, // Boolean
     args: true, // Boolean
-    usage: '<prefix>',
+    usage: '{prefix}setprefix <prefix>',
     cooldown: 10, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["ADMINISTRATOR"],
-}
+    permissions: ['ADMINISTRATOR'],
+    run: async ({ message, args, prefix }) => {
+        const newPrefix = args[0];
+        if (!newPrefix || newPrefix === prefix)
+            return message.channel.send('Please make sure you provide a **new** prefix!'); // If they don't provide a prefix or they try use the same prefix then this will be sent.
+        
+        try {
+            await schema.findOneAndUpdate({
+                GuildID: message.guild.id
+            }, {
+                GuildID: message.guild.id,
+                GuildName: message.guild.name,
+                Prefix: newPrefix
+            }, {
+                upsert: true
+            }); // Saving the data to the database, we use upsert: true for incase there is no data.
+        } catch (err) {
+            console.log(err);
+            return message.channel.send('An error occured whilst saving the prefix, please try again!');
+        }
 
-module.exports.run = async (client, message, args) => {
-
-const schema = require ('../../mongoose/prefix') // Defining the schema
-
-await schema.findOneAndUpdate({ // Finding the guild id in the database and updating the data
-    GuildID: message.guild.id
-}, {
-    GuildName: message.guild.name,
-    GuildID: message.guild.id,
-    Prefix: args[0] // Setting the new prefix
-}, {
-    upsert: true // Upsert makes it so if the guild isnt currently in the database it will make new data instead of updating
-})
-
-message.channel.send(`The prefix has been set to \`${args[0]}\``) // Replying telling you the prefix has been updated to your first argument
-
+        message.channel.send(`${guild.name}'s prefix has now been set to \`${newPrefix}\``);
+    }
 }

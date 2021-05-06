@@ -10,7 +10,7 @@ module.exports = {
     dmOnly: false, // Boolean
     guildOnly: false, // Boolean
     args: false, // Boolean
-    usage: '{prefix}false',
+    usage: '{prefix}dog',
     cooldown: 5, //seconds(s)
     guarded: false, // Boolean
     permissions: ['SEND_MESSAGES'],

@@ -201,7 +201,7 @@ client.on("message", async message => {
             return message.reply('You can not do this!');
         }
 
-        cmd.run({ client, message, args });
+        cmd.run({ client, message, args, prefix });
     } catch (err) {    
         message.reply(`There was an error in the console.`);
         console.log(err);

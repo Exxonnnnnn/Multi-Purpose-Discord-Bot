@@ -1,36 +1,43 @@
-const Discord = require ('discord.js')
-const schema = require ('../../mongoose/React-Channel')
-module.exports.config = {
-    name: "setreactchannel",
+const schema = require('../../mongoose/React-Channel'); // Defining the schema
+
+module.exports = {
+    name: 'setreactchannel',
     aliases: [],
     description: 'This will set the channel for the \`reactrole\` channel to fetch the message from. This will allow you to set the react role in that channel.',
-    category: "config",
+    category: 'config',
     dmOnly: false, // Boolean
     guildOnly: true, // Boolean
     args: true, // Boolean
-    usage: '<Channel>',
+    usage: '{prefix}setreactchannel <Channel>',
     cooldown: 5, //seconds(s)
     guarded: false, // Boolean
-    permissions: ["ADMINISTRATOR"],
-}
+    permissions: ['ADMINISTRATOR'],
+    run: async ({ message, args }) => {
+        const channel = message.guild.channels.cache.get(args[0]) ||
+            message.guild.channels.cache.find(c => c.name === args[0]) ||
+            message.mentions.channels.first(); // Defining the channel
+        
+        if (!channel ||
+            channel.type !== 'text' ||
+            channel.type !== 'news'
+        )
+            return message.channel.send('Please make sure you state a valid text channel!'); // If a channel was not found then it will return and send this message
+        
+        try {
+            await schema.findOneAndUpdate({
+                GuildID: message.guild.id
+            }, {
+                GuildID: message.guild.id,
+                GuildName: message.guild.name,
+                ChannelID: channel.id
+            }, {
+                upsert: true
+            }); // Saving the data to the database, we use upsert: true for incase there is no data.
+        } catch (err) {
+            console.log(err);
+            return message.channel.send('An error occured whilst saving the react channel, please try again!');
+        }
 
-module.exports.run = async (client, message, args) => {
-
-let channel = message.mentions.channels.first() // Defining the channel as the first channel mention
-if (!channel) channel = message.guild.channels.cache.find(c => c.id === args[0]) // Trying to get the channel from the specified id from the message guild
-if (!channel) channel = client.channels.cache.get(args[0]) 
-if (!channel) return message.channel.send('Please make sure you state a valid channel!') // If no channel was found it will return with this message
-
-await schema.findOneAndUpdate({
-    GuildID: message.guild.id
-}, {
-    GuildName: message.guild.name,
-    GuildID: message.guild.id,
-    ChannelID: channel.id
-}, {
-    upsert: true // If no current data it will create new data, if data for the guild is found then it will update that data
-})
-
-message.channel.send(`React channel has been set to ${channel}`)
-
+        message.channel.send(`The react channel has been set to ${channel}`);
+    }
 }
