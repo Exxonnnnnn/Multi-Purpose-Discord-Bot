@@ -1,9 +1,9 @@
-const mongoose = require ('mongoose')
+const { Schema, model } = require('mongoose');
 
-const Schema = new mongoose.Schema({
+const Schema = new Schema({
     GuildName: String,
     GuildID: String,
     ChannelID: String
-})
+});
 
-module.exports = mongoose.model ('Bot-Mod-Logs-Channels', Schema)
+module.exports = model('Bot-Mod-Logs-Channels', Schema);

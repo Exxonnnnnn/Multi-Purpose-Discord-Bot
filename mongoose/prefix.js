@@ -1,9 +1,9 @@
-const mongoose = require ('mongoose')
+const { Schema, model } = require('mongoose');
 
-const PrefixSchema = new mongoose.Schema({
+const PrefixSchema = new Schema({
     GuildName: String,
     GuildID: String,
     Prefix: String
-})
+});
 
-module.exports = mongoose.model('Bot-Prefixes', PrefixSchema)
+module.exports = model('Bot-Prefixes', PrefixSchema);

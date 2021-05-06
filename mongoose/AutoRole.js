@@ -1,9 +1,9 @@
-const mongoose = require ('mongoose')
+const { Schema, model } = require('mongoose');
 
-const AutoSchema = new mongoose.Schema({
+const AutoSchema = new Schema({
     GuildName: String,
     GuildID: String,
     RoleID: String
-})
+});
 
-module.exports = mongoose.model('Bot-AutoRoles', AutoSchema)
+module.exports = model('Bot-AutoRoles', AutoSchema);

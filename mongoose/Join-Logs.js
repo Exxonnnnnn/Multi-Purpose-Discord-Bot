@@ -1,9 +1,9 @@
-const mongoose = require ('mongoose')
+const { Schema, model } = require('mongoose');
 
-const JoinSchema = new mongoose.Schema({
+const JoinSchema = new Schema({
     GuildName: String,
     GuildID: String,
     ChannelID: String
-})
+});
 
-module.exports = mongoose.model ('Bot-Join-Logs', JoinSchema)
+module.exports = model('Bot-Join-Logs', JoinSchema);

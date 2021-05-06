@@ -14,20 +14,21 @@
 ╚═╝░░░░░╚═╝░╚════╝░╚═════╝░░╚═════╝░╚══════╝╚══════╝╚═════╝░
 */
 
-const Discord = require ('discord.js') // Defining Discord as the discord.js module
-const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] }); // Defining the discord client aswell as the partials needed
-const fs = require ('fs') // Defining FS needed for the file management
-const mongoose = require ('mongoose') // Defining mongoose
-let ascii = require ('ascii-table') // Defining ascii for the file management events
-const { Player } = require ('discord-player') // Defining Player as the discord-player
-client.player = new Player(client) // Defining client.player as a new player
-const schema = require ('./mongoose/prefix') // Defining the prefix schema
-const MessageDelete = require ('./events/MessageDelete') // Defining the MessageDelete event
-const guildMemberAdd = require ('./events/GuildMemberAdd') // Defining the memberadd event
-const guildMemberRemove = require ('./events/GuildMemberRemove') // Defining the member remove event
-const messageReactionAdd = require ('./events/ReactionAdd') // Defining the reaction add event
-const ModLogs = require ('./events/Server-Logs') // Defining the modlogs events
-const config = require ('./configs/config.json') // Defining the config.json file
+const { Client, Collection } = require('discord.js'); // Defining Discord as the discord.js module
+const fs = require('fs'); // Defining FS needed for the file management
+const { connect } = require('mongoose'); // Defining mongoose
+let ascii = require('ascii-table'); // Defining ascii for the file management events
+const { Player } = require('discord-player'); // Defining Player as the discord-player
+const schema = require('./mongoose/prefix'); // Defining the prefix schema
+const MessageDelete = require('./events/MessageDelete'); // Defining the MessageDelete event
+const guildMemberAdd = require('./events/GuildMemberAdd'); // Defining the memberadd event
+const guildMemberRemove = require('./events/GuildMemberRemove'); // Defining the member remove event
+const messageReactionAdd = require('./events/ReactionAdd'); // Defining the reaction add event
+const ModLogs = require('./events/Server-Logs'); // Defining the modlogs events
+const config = require('./configs/config.json'); // Defining the config.json file
+
+const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] }); // Defining the discord client aswell as the partials needed
+client.player = new Player(client); // Defining client.player as a new player
 
 /*
 
@@ -40,14 +41,15 @@ const config = require ('./configs/config.json') // Defining the config.json fil
 */
 
 client.on("ready", () => {
+    console.log(
+        `Logged in as ${client.user.tag}. Bot Invite: https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot`
+    );
 
-    console.log(`Logged in as ${client.user.tag}. Bot Invite: https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=8&scope=bot`)
-
-    MessageDelete(client)
-    guildMemberAdd(client)
-    guildMemberRemove(client)
-    ModLogs(client)
-    messageReactionAdd(client)
+    MessageDelete(client);
+    guildMemberAdd(client);
+    guildMemberRemove(client);
+    ModLogs(client);
+    messageReactionAdd(client);
 })
 
 /*
@@ -60,8 +62,8 @@ client.on("ready", () => {
 ░╚════╝░░╚════╝░╚═╝░░╚══╝╚═╝░░╚══╝╚══════╝░╚════╝░░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝╚═════╝░
 */
 
-client.login(config.token)
-mongoose.connect(config.MongoURL, {
+client.login(config.token);
+connect(config.MongoURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false
@@ -86,12 +88,12 @@ for (const file of player) {
 
 
 //Command Handler
-client.commands = new Discord.Collection(); // Defining the client commands for the commands folder
-client.aliases = new Discord.Collection(); // Defining the client aliases for the commands folder
-cooldowns = new Discord.Collection()
+client.commands = new Collection(); // Defining the client commands for the commands folder
+client.aliases = new Collection(); // Defining the client aliases for the commands folder
+const cooldowns = new Collection();
 
-let table = new ascii("Bot Commands") // Defining a new table with the title "Bot Commands"
-table.setHeading("Command", "Load Status") // Adding headers to the table for the bot commands
+let table = new ascii("Bot Commands"); // Defining a new table with the title "Bot Commands"
+table.setHeading("Command", "Load Status"); // Adding headers to the table for the bot commands
 
 fs.readdirSync("./commands/").forEach(dir => { // Reading all files in the commands folder
     const commands = fs.readdirSync(`./commands/${dir}/`).filter(file => file.endsWith(".js")); // Defining commands and filtering the files to only get the names 
@@ -120,193 +122,88 @@ console.log(table.toString()); //showing the table
 ██║░╚═╝░██║███████╗██████╔╝██████╔╝██║░░██║╚██████╔╝███████╗  ███████╗░░╚██╔╝░░███████╗██║░╚███║░░░██║░░░
 ╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚═════╝░╚═╝░░╚═╝░╚═════╝░╚══════╝  ╚══════╝░░░╚═╝░░░╚══════╝╚═╝░░╚══╝░░░╚═╝░░░
 
-███╗░░██╗░█████╗░  ░██████╗███████╗████████╗  ██████╗░██████╗░███████╗███████╗██╗██╗░░██╗
-████╗░██║██╔══██╗  ██╔════╝██╔════╝╚══██╔══╝  ██╔══██╗██╔══██╗██╔════╝██╔════╝██║╚██╗██╔╝
-██╔██╗██║██║░░██║  ╚█████╗░█████╗░░░░░██║░░░  ██████╔╝██████╔╝█████╗░░█████╗░░██║░╚███╔╝░
-██║╚████║██║░░██║  ░╚═══██╗██╔══╝░░░░░██║░░░  ██╔═══╝░██╔══██╗██╔══╝░░██╔══╝░░██║░██╔██╗░
-██║░╚███║╚█████╔╝  ██████╔╝███████╗░░░██║░░░  ██║░░░░░██║░░██║███████╗██║░░░░░██║██╔╝╚██╗
-╚═╝░░╚══╝░╚════╝░  ╚═════╝░╚══════╝░░░╚═╝░░░  ╚═╝░░░░░╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚═╝╚═╝░░╚═╝
 */
 
 client.on("message", async message => {
-
-    if (message.author.bot) return
+    if (message.author.bot) return;
 
     const data = await schema.findOne({
         GuildID: message.guild.id
-    })
+    });
 
-    if (!data) {
+    const prefix = data && data.Prefix ? data.Prefix : config.prefix;
 
-    if(message.author.bot || !message.content.startsWith(config.prefix)) return;
+
+    if (message.author.bot || !message.content.startsWith(prefix)) return;
     const args = message.content.slice(config.prefix.length).split(/ +/g);
     if (!args.length) return message.channel.send(`You didn't pass any command to reload, ${message.author}!`);
     const commandName = args.shift().toLowerCase();
 
     const cmd = client.commands.get(commandName)
+        || client.commands.find(
+            cmd => cmd.config.aliases && cmd.config.aliases.includes(commandName)
+        );
 
-    || client.commands.find(cmd => cmd.config.aliases && cmd.config.aliases.includes(commandName));
+    if (!cmd) return;
 
-    if (!cmd) return
-
-        try{
-
-            //+ cooldown 1, //seconds(s)
-            if (!cooldowns.has(cmd.config.name)) {
-                cooldowns.set(cmd.config.name, new Discord.Collection());
+    try {
+        //+ cooldown 1, //seconds(s)
+        if (!cooldowns.has(cmd.config.name)) {
+            cooldowns.set(cmd.config.name, new Collection());
+        }
+            
+        const now = Date.now();
+        const timestamps = cooldowns.get(cmd.config.name);
+        const cooldownAmount = (cmd.config.cooldown || 3) * 1000;
+            
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+            
+            if (now < expirationTime) {
+                const timeLeft = (expirationTime - now) / 1000;
+                return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${cmd.config.name}\` command.`);
             }
-            
-            const now = Date.now();
-            const timestamps = cooldowns.get(cmd.config.name);
-            const cooldownAmount = (cmd.config.cooldown || 3) * 1000;
-            
-            if (timestamps.has(message.author.id)) {
-                const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-            
-                if (now < expirationTime) {
-                    const timeLeft = (expirationTime - now) / 1000;
-                    return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${cmd.config.name}\` command.`);
-                }
-            }
-            timestamps.set(message.author.id, now);
-            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+        }
+        timestamps.set(message.author.id, now);
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
         //+ args: true/false,
         if (cmd.config.args && !args.length) {
-            		let reply = `You didn't provide any arguments, ${message.author}!`;
+            let reply = `You didn't provide any arguments, ${message.author}!`;
 
-                    //+ usage: '<> <>',
-            		if (cmd.config.usage) {
-            			reply += `\nThe proper usage would be: \`${config.prefix}${cmd.config.name} ${cmd.config.usage}\``;
-            		}
-            
-            		return message.channel.send(reply);
-                }
-                 
-                 //+ permissions: [""],
-                 if (cmd.config.permissions) {
-                     	const authorPerms = message.channel.permissionsFor(message.author);
-                     	if (!authorPerms || !authorPerms.has(cmd.config.permissions)) {
-                     		return message.reply('You can not do this!');
-                    	}
-                     }
-
-                //+ guildOnly: true/false,
-                if (cmd.config.guildOnly && message.channel.type === 'dm') {
-                    return message.reply('I can\'t execute that command inside DMs!');
-                }
-
-                //+ dmOnly: true/false,
-                if (cmd.config.dmOnly && message.channel.type === 'text') {
-                    return message.reply('I can\'t execute that command inside the server!');
-                }
-
-                if(cmd.config.guarded && message.author.id !== config.DevID) {
-                    return message.reply('You can not do this!')
-                }
-
-        cmd.run(client, message, args);
-    }catch(err){
-        message.reply(`there was an error in the console.`);
-        console.log(err);
-    }
-
-/*
-
-███╗░░░███╗███████╗░██████╗░██████╗░█████╗░░██████╗░███████╗  ███████╗██╗░░░██╗███████╗███╗░░██╗████████╗
-████╗░████║██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝░██╔════╝  ██╔════╝██║░░░██║██╔════╝████╗░██║╚══██╔══╝
-██╔████╔██║█████╗░░╚█████╗░╚█████╗░███████║██║░░██╗░█████╗░░  █████╗░░╚██╗░██╔╝█████╗░░██╔██╗██║░░░██║░░░
-██║╚██╔╝██║██╔══╝░░░╚═══██╗░╚═══██╗██╔══██║██║░░╚██╗██╔══╝░░  ██╔══╝░░░╚████╔╝░██╔══╝░░██║╚████║░░░██║░░░
-██║░╚═╝░██║███████╗██████╔╝██████╔╝██║░░██║╚██████╔╝███████╗  ███████╗░░╚██╔╝░░███████╗██║░╚███║░░░██║░░░
-╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚═════╝░╚═╝░░╚═╝░╚═════╝░╚══════╝  ╚══════╝░░░╚═╝░░░╚══════╝╚═╝░░╚══╝░░░╚═╝░░░
-
-░  ░██████╗███████╗████████╗  ██████╗░██████╗░███████╗███████╗██╗██╗░░██╗
-╗ ██╔════╝██╔════╝╚══██╔══╝  ██╔══██╗██╔══██╗██╔════╝██╔════╝██║╚██╗██╔╝
-  ╚█████╗░█████╗░░░░░██║░░░  ██████╔╝██████╔╝█████╗░░█████╗░░██║░╚███╔╝░
-  ░╚═══██╗██╔══╝░░░░░██║░░░  ██╔═══╝░██╔══██╗██╔══╝░░██╔══╝░░██║░██╔██╗░
-  ██████╔╝███████╗░░░██║░░░  ██║░░░░░██║░░██║███████╗██║░░░░░██║██╔╝╚██╗
-  ╚═════╝░╚══════╝░░░╚═╝░░░  ╚═╝░░░░░╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚═╝╚═╝░░╚═╝
-*/
-
-
-
- } else if (data) {
-
-    const prefix = data.Prefix
-
-    if(message.author.bot || !message.content.startsWith(prefix)) return;
-    const args = message.content.slice(prefix.length).split(/ +/g);
-    if (!args.length) return message.channel.send(`You didn't pass any command to reload, ${message.author}!`);
-    const commandName = args.shift().toLowerCase();
-
-    const cmd = client.commands.get(commandName)
-        //+ aliases: [""],
-        || client.commands.find(cmd => cmd.config.aliases && cmd.config.aliases.includes(commandName));
-
-        if (!cmd) return 
-        try{
-
-            //+ cooldown 1, //seconds(s)
-            if (!cooldowns.has(cmd.config.name)) {
-                cooldowns.set(cmd.config.name, new Discord.Collection());
+            //+ usage: '<> <>',
+            if (cmd.config.usage) {
+                reply += `\nThe proper usage would be: \`${config.prefix}${cmd.config.name} ${cmd.config.usage}\``;
             }
             
-            const now = Date.now();
-            const timestamps = cooldowns.get(cmd.config.name);
-            const cooldownAmount = (cmd.config.cooldown || 3) * 1000;
-            
-            if (timestamps.has(message.author.id)) {
-                const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-            
-                if (now < expirationTime) {
-                    const timeLeft = (expirationTime - now) / 1000;
-                    return message.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${cmd.config.name}\` command.`);
-                }
-            }
-            timestamps.set(message.author.id, now);
-            setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-
-        //+ args: true/false,
-        if (cmd.config.args && !args.length) {
-            		let reply = `You didn't provide any arguments, ${message.author}!`;
-
-                    //+ usage: '<> <>',
-            		if (cmd.config.usage) {
-            			reply += `\nThe proper usage would be: \`${prefix}${cmd.config.name} ${cmd.config.usage}\``;
-            		}
-            
-            		return message.channel.send(reply);
-                }
+            return message.channel.send(reply);
+        };
                  
-                 //+ permissions: [""],
-                 if (cmd.config.permissions) {
-                     	const authorPerms = message.channel.permissionsFor(message.author);
-                     	if (!authorPerms || !authorPerms.has(cmd.config.permissions)) {
-                     		return message.reply('You can not do this!');
-                    	}
-                     }
+        //+ permissions: [""],
+        if (cmd.config.permissions) {
+            const authorPerms = message.channel.permissionsFor(message.author);
+            if (!authorPerms || !authorPerms.has(cmd.config.permissions)) {
+                return message.reply('You can not do this!');
+            }
+        }
 
-                //+ guildOnly: true/false,
-                if (cmd.config.guildOnly && message.channel.type === 'dm') {
-                    return message.reply('I can\'t execute that command inside DMs!');
-                }
+        //+ guildOnly: true/false,
+        if (cmd.config.guildOnly && !message.guild) {
+            return message.reply('I can\'t execute that command inside DMs!');
+        }
 
-                //+ dmOnly: true/false,
-                if (cmd.config.dmOnly && message.channel.type === 'text') {
-                    return message.reply('I can\'t execute that command inside the server!');
-                }
+        //+ dmOnly: true/false,
+        if (cmd.config.dmOnly && message.guild) {
+            return message.reply('I can\'t execute that command inside the server!');
+        }
 
-                if(cmd.config.guarded && message.author.id !== config.DevID) {
-                    return message.reply('You can not do this!')
-                }
-
+        if (cmd.config.guarded && message.author.id !== config.DevID) {
+            return message.reply('You can not do this!');
+        }
 
         cmd.run(client, message, args);
-    }catch(err){
-        message.reply(`there was an error in the console.`);
+    } catch (err) {    
+        message.reply(`There was an error in the console.`);
         console.log(err);
     }
-
-}
-
 })

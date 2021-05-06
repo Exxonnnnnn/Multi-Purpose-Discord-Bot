@@ -1,9 +1,9 @@
-const mongoose = require ('mongoose')
+const { Schema, model } = require('mongoose');
 
-const DeleteSchema = new mongoose.Schema({
+const DeleteSchema = new Schema({
     GuildName: String,
     GuildID: String,
     ChannelID: String
-})
+});
 
-module.exports = mongoose.model('Bot-Delete-Log-Channels', DeleteSchema)
+module.exports = model('Bot-Delete-Log-Channels', DeleteSchema);
